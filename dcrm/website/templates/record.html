@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load tz %}
+{% block content %}
+
+<style>
+    .document-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .document-list li {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        width: calc(50% - 0.5rem);
+    }
+
+    .document-list li:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .document-list li a {
+        text-decoration: none;
+        color: #007bff;
+    }
+
+    .document-list li a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 767px) {
+        .document-list li {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <h5 class="card-header card-header text-center">
+                    <strong>{{ customer_record.first_name }} {{ customer_record.last_name }}</strong>
+                </h5>
+                <div class="card-body">
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <strong>Email:</strong> {{ customer_record.email }}
+                        </div>
+                    </div>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <strong>Phone:</strong> {{ customer_record.phone }}
+                        </div>
+                    </div>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <strong>Address:</strong> {{ customer_record.address }}
+                        </div>
+                    </div>
+                    <!-- Repeat the pattern for other information -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <h5 class="card-header text-center">
+                    <strong>Additional Information</strong>
+                </h5>
+
+                <div class="card-body ">
+                    
+                    {% if days_until_expiry > 100 %}
+                    <div class="alert alert-success text-center" role="alert">
+                    <p><strong>Contract is expiring in {{ days_until_expiry }} days.</strong></p>
+                    </div>
+                    {% elif days_until_expiry == 100 %}
+                    <div class="alert alert-danger text-center" role="alert">
+                    <p><strong>Contract is expiring in 100 days!<br/><br/>
+                        <a class="btn btn-primary" href="mailto:?subject=Contract%20Renewal%20for {{ customer_record.property }}&body=Hello%20,%0A%0AWe%20would%20like%20to%20remind%20you%20that%20your%20contract%20is%20expiring%20in%20100%20days.%20Please%20consider%20renewing%20it.%0A%0AThank%20you.">
+                            Send Renewal
+                        </a>
+                    </strong></p>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-danger text-center" role="alert">
+                        <p><strong>Contract is expiring in {{ days_until_expiry }} days.</strong></p>
+                    </div>
+                    {% endif %}
+                    
+                  <li class="list-group-item"><strong>Living in:</strong> {{ customer_record.property }}</li>
+                  <li class="list-group-item"><strong>DEWA No.</strong> {{ customer_record.dewa }}</li>
+                  <li class="list-group-item"><strong>Contract Start Date:</strong> {{ customer_record.contract_start}}</li>
+                  <li class="list-group-item"><strong>Contract End Date:</strong> {{ customer_record.contract_end}}</li>
+                  <li class="list-group-item"><strong>Annual Rent:</strong> {{ customer_record.annual_rent}} AED</li>
+                  <li class="list-group-item"><strong>Contract Value:</strong> {{ customer_record.contract_value}} AED</li>
+                  <li class="list-group-item"><strong>Security Deposit:</strong> {{ customer_record.security_deposit}} AED</li>
+                  <li class="list-group-item"><strong>Mode of payment:</strong> {{ customer_record.mode_of_payment}}</li>
+                  <li class="list-group-item"><strong>Number of cheques:</strong> {{ customer_record.number_of_cheques}}</li>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            <h2>Uploaded Documents</h2>
+            <ul class="document-list">
+                {% for document_info, document_url in document_info_urls %}
+                    <li>
+                        <strong>{{ document_info }}:</strong>
+                        {% if document_url %}
+                            <a href="{{ document_url }}" target="_blank" rel="noopener noreferrer">View Document</a>
+                        {% else %}
+                            <span class="text-danger">Document not uploaded. Please upload the document.</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+    <div class="card-footer mt-2">
+        <a href="{% url 'home' %}" class="btn btn-warning">Back to Customers List</a>
+        <a href="{% url 'delete_record' customer_record.id %}" class="btn btn-danger">Delete Record</a>
+        <a href="{% url 'update_record' customer_record.id %}" class="btn btn-secondary">Update Record</a>
+    </div>
+</div>
+{% endblock %}

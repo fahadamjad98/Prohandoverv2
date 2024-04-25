@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    .property-card {
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .property-card:hover {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .property-card .card-header {
+        background: linear-gradient(45deg, #343a40, #212529);
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .property-card .card-body .card {
+        border: 1px solid #dee2e6;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .property-card .card-body .card:hover {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .property-card .card-footer {
+        border-top: none;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    .property-card .btn {
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .property-card .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .document-list {
+        list-style: none;
+        padding: 10;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .document-list li {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        width: calc(50% - 0.5rem);
+    }
+
+    .document-list li:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .document-list li a {
+        text-decoration: none;
+        color: #007bff;
+    }
+
+    .document-list li a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 767px) {
+        .document-list li {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="property-card card border-dark">
+        <div class="card-header text-white text-center">
+            <h1 class="card-title mb-1" style="font-size: 2rem;">
+                <strong>{{ owner_property.property_number }} {{ owner_property.property_name }}</strong>
+            </h1>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Location:</h6>
+                            <p class="card-text">{{ owner_property.property_location }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Unit Number:</h6>
+                            <p class="card-text">{{ owner_property.property_number }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Sqft:</h6>
+                            <p class="card-text">{{ owner_property.property_size }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Type:</h6>
+                            <p class="card-text">{{ owner_property.property_type }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Bedrooms:</h6>
+                            <p class="card-text">{{ owner_property.property_bedrooms }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Bathrooms:</h6>
+                            <p class="card-text">{{ owner_property.property_bathrooms }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Rent Price:</h6>
+                    <h4 class="card-text"><strong>{{ owner_property.property_rentedFor }}</strong></h4>
+                </div>
+            </div>
+        </div>
+        <h2>Uploaded Documents</h2>
+            <ul class="document-list">
+                {% for document_info, document_url in document_info_urls %}
+                    {% if document_url %}
+                        <li>
+                            <strong>{{ document_info }}:</strong>
+                            <a href="{{ document_url }}" target="_blank" rel="noopener noreferrer">View Document</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        <div class="card-footer bg-light">
+            <div class="d-flex justify-content-center">
+                <a href="{% url 'delete_property' owner_property.id %}" class="btn btn-outline-danger mx-2">
+                    <i class="bi bi-trash"></i> Delete Property
+                </a>
+                <a href="{% url 'update_property' owner_property.id %}" class="btn btn-outline-primary mx-2">
+                    <i class="bi bi-box-arrow-up"></i> Update Property
+                </a>
+                <div class="d-flex justify-content-end">
+                    <a class="btn btn-outline-info" href="{% url 'add_record' %}">
+                        <i class="bi bi-plus"></i> Add a tenant here
+                    </a>
+                </div>
+            </div>
+            <a href="{% url 'home' %}" class="btn btn-outline-info mx-2">
+                <i class="bi bi-caret-left"></i> Back to Customers List
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

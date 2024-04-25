@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+  .form-control[disabled] {
+    background-color: #f8f9fa; /* Light gray background */
+    opacity: 1; /* Ensure full opacity */
+    cursor: not-allowed; /* Show cursor as not-allowed */
+}
+
+</style>
+  <br/>
+
+  <div class="container mt-5">
+    <h3 class="text-center">Please fill the information below</h3>
+    <form method="POST" action="{% url 'add_record' %}" enctype="multipart/form-data" class="row justify-content-center">
+
+      {% csrf_token %}
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title">Tenant Info</h5>
+          </div>
+          <div class="card-body">
+            <div class="form-group row">
+              <div class="col">
+                {{ form.first_name.label_tag }}
+                {{ form.first_name }}
+                {{ form.first_name.errors }}
+              </div>
+              <div class="col">
+                {{ form.last_name.label_tag }}
+                {{ form.last_name }}
+                {{ form.last_name.errors }}
+              </div>
+            </div>
+            <div class="form-group">
+              {{ form.tenant_email.label_tag }}
+              {% if user.is_owner %}
+                  {{ form.tenant_email }}
+              {% else %}
+                  <input type="text" class="form-control" value="{{ form.tenant_email.value|default_if_none:'' }}" disabled>
+                  <input type="hidden" name="{{ form.tenant_email.name }}" value="{{ form.tenant_email.value|default_if_none:'' }}">
+              {% endif %}
+              {{ form.tenant_email.errors }}
+            </div>
+
+            <div class="form-group">
+              {{ form.phone.label_tag }}
+              {{ form.phone }}
+              {{ form.phone.errors }}
+            </div>
+
+            <div class="form-group">
+              {{ form.address.label_tag }}
+              {{ form.address }}
+              {{ form.address.errors }}
+            </div>
+
+            <div class="form-group">
+              {{ form.state.label_tag }}
+              {{ form.state }}
+              {{ form.state.errors }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title">Contract Info</h5>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              {{ form.property.label_tag }}
+              {{ form.property }}
+              {{ form.property.errors }}
+            </div>
+            <div id="association-status-property"></div>
+
+            <div class="form-group">
+              {{ form.dewa.label_tag }}
+              {{ form.dewa }}
+              {{ form.dewa.errors }}
+            </div>
+
+            <div class="form-group">
+              {{ form.contract_start.label_tag }}
+              {{ form.contract_start }}
+              {{ form.contract_start.errors }}
+            </div>
+
+            <div class="form-group">
+              {{ form.contract_end.label_tag }}
+              {{ form.contract_end }}
+              {{ form.contract_end.errors }}
+            </div>
+
+            <div class="form-group">
+              {{ form.annual_rent.label_tag }}
+              {{ form.annual_rent }}
+              {{ form.annual_rent.errors }}
+            </div>
+
+            <div class="form-group">
+              {{ form.contract_value.label_tag }}
+              {{ form.contract_value }}
+              {{ form.contract_value.errors }}
+            </div>
+
+            <div class="form-group">
+              {{ form.security_deposit.label_tag }}
+              {{ form.security_deposit }}
+              {{ form.security_deposit.errors }}
+            </div>
+
+            <div class="form-group">
+              {{ form.mode_of_payment.label_tag }}
+              {{ form.mode_of_payment }}
+              {{ form.mode_of_payment.errors }}
+            </div>
+
+            <div class="form-group" id="cheques-field" style="display: none;">
+              {{ form.number_of_cheques.label_tag }}
+              {{ form.number_of_cheques }}
+              {{ form.number_of_cheques.errors }}
+              
+            </div>
+
+           
+              {{ form.tenant_doc_info_1 }}
+              <input type="file" name="tenant_document_1" id="id_tenant_document_1">
+              <br>
+              
+              {{ form.tenant_doc_info_2 }}
+              <input type="file" name="tenant_document_2" id="id_tenant_document_2">
+              
+              {{ form.tenant_doc_info_3 }}
+              <input type="file" name="tenant_document_3" id="id_tenant_document_3">
+              
+              {{ form.tenant_doc_info_4 }}
+              <input type="file" name="tenant_document_4" id="id_tenant_document_4">
+              
+              {{ form.tenant_doc_info_5 }}
+              <input type="file" name="tenant_document_5" id="id_tenant_document_5">
+
+              {{ form.tenant_doc_info_6 }}
+              <input type="file" name="tenant_document_6" id="id_tenant_document_6">
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <a href="{% url 'list_of_properties' %}" class="btn btn-warning btn-block">Go Back</a>
+              </div>
+              <div class="col-md-6">
+                <button type="submit" class="btn btn-primary btn-block">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{ document_form.as_p }}
+      
+
+      
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var modeOfPaymentField = document.getElementById('id_mode_of_payment');
+      var chequesField = document.getElementById('cheques-field');
+
+      // Function to toggle visibility of the number_of_cheques field
+      function toggleChequesField() {
+        if (modeOfPaymentField.value === 'Cheque') {
+          chequesField.style.display = 'block';
+        } else {
+          chequesField.style.display = 'none';
+          document.getElementById('id_number_of_cheques').value = '';  // Clear the field when hidden
+        }
+      }
+
+      // Initial setup
+      toggleChequesField();
+
+      // Attach an event listener to mode_of_payment field change
+      modeOfPaymentField.addEventListener('change', toggleChequesField);
+    });
+  </script>
+
+{% endblock %}

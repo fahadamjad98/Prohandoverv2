@@ -1,0 +1,629 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .modal-header {
+
+    color: #343a40;
+    padding: 1rem;
+    border-top-left-radius: 0.3rem;
+    border-top-right-radius: 0.3rem;
+  }
+  
+  .modal-footer {
+    justify-content: center;
+  }
+
+  /* General Styles */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+  }
+  
+  .container {
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .card-header {
+    background-color: #343a40;
+    color: #fff;
+    padding: 1rem;
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  /* Alert Styles */
+  .alert {
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  .alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  /* Button Styles */
+  .btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+  }
+  
+  .btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+  }
+  
+  /* Date Pill Styles */
+  .date-pill {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    background-color: orange;
+    color: #fff;
+    font-weight: 500;
+  }
+  
+  /* Animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate {
+    animation: fadeInUp 0.5s ease-out;
+  }
+
+
+
+
+
+
+
+  /* Table Styles */
+  .table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table thead th {
+    background-color: #343a40;
+    color: #fff;
+    padding: 1rem;
+  }
+  
+  .table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  
+  .table tbody tr:hover {
+    background-color: #e9ecef;
+  }
+  
+  /* Status Pill Styles */
+  .status-pill {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  
+  .pending {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .approved {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .rejected {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* Animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate {
+    animation: fadeInUp 0.5s ease-out;
+  }
+  
+
+</style>
+
+<div class="container text-center animate">
+<div class="container text-center">
+    <br/>
+   
+</div>
+<br/>
+{% if record %}
+
+<div class="container mt-4">
+  <div class="card text-left" style="max-width: 500px;">
+    <div class="card-body text-center">
+      
+  <h3><i class="bi bi-speedometer"></i> Tenant Dashboard</h3>
+    </div>
+  </div>
+
+
+  <div class="row">
+      <div class="col-md-6">
+          <div class="card mb-3">
+              <div class="card-header bg-dark text-white">
+                  <h5 class="mb-0 text-center">{{record.first_name | title }} {{record.last_name | title }}</h5>
+              </div>
+              <div class="card-body">
+                  <div class="card mb-2">
+                      <div class="card-body text-center">
+                          <strong class="fs-3" style="color:#343a40;">Living in:</strong> <strong class="fs-3">{{ record.property }}</strong>
+                      </div>
+                  </div>
+                  <div class="card mb-2">
+                      <div class="card-body">
+                          <strong>Phone Number:</strong> {{ record.phone }}
+                      </div>
+                  </div>
+                  <div class="card mb-2">
+                      <div class="card-body">
+                          <strong>Email:</strong> {{ record.email }}
+                      </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-2">
+                            <div class="card-body text-center">
+                                <strong>Address:</strong> {{ record.address }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <strong>State:</strong> {{ record.state }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                      
+                          <div class="card-body text-center">
+                            <li class="list-group-item"><strong>Contract Start Date:</strong>
+                              <br/><span class="date-pill start-date">
+                                {{ record.contract_start }}
+                              </span>
+                            </li>
+                          </div>
+                     
+                  </div>
+                  <div class="col-md-6">
+                     
+                          <div class="card-body text-center">
+                            <li class="list-group-item"><strong>Contract End Date:</strong> 
+                             <br/> <span class="date-pill end-date">
+                                {{ record.contract_end}}               
+                              </span>
+                            </li>
+                          </div>
+                      
+                  </div>
+              </div>
+              </div>
+          </div>
+      </div>
+    <div class="col-md-6">
+      <div class="card">
+        <h5 class="card-header bg-dark text-light text-center">
+          <strong>Additional Information</strong>
+        </h5>
+        <div class="card-body">
+          <ul class="list-group">
+            
+            {% if days_until_expiry > 100 %}
+            <div class="alert alert-success text-center" role="alert">
+              <p><strong>Your Contract is expiring in {{ days_until_expiry }} days.</strong></p>
+            </div>
+            {% elif days_until_expiry == 60 %}
+            <div class="alert alert-danger" role="alert">
+              <p><strong>Your Contract is expiring in 60 days!</strong></p>
+              <a class="btn btn-success" href="mailto:?subject=Contract%20Renewal&body=Hello%20,%0A%0AI%20would%20like%20to%20renew%20my%20contract.%20Please%20consider%20renewing%20my%20contract.%0A%0AThank%20you">
+                Send Renewal
+              </a>
+            </div>
+            {% elif days_until_expiry > 0 %}
+            <div class="alert alert-danger" role="alert">
+              <p><strong>Your Contract is expiring in {{ days_until_expiry }} days.</strong></p>
+            </div>
+            {% else %}
+            <div class="alert alert-warning" role="alert">
+              <p><strong>Your Contract has expired.</strong></p>
+            </div>
+            {% endif %}
+            <div class="card mb-2">
+              <div class="card-body">
+            <span ><strong>DEWA No.</strong> {{ record.dewa }}</span>
+              </div>
+            </div>
+            <div class="card mb-2">
+              <div class="card-body">
+            <span ><strong>Annual Rent:</strong> {{ record.annual_rent}} AED</span>
+              </div>
+            </div>
+            <div class="card mb-2">
+              <div class="card-body">
+            <span><strong>Contract Value:</strong> {{ record.contract_value}} AED</span>
+              </div>
+            </div>
+            <div class="card mb-2">
+              <div class="card-body">
+            <span><strong>Security Deposit:</strong> {{ record.security_deposit}} AED</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                  <div class="card mb-2">
+                      <div class="card-body">
+                          <strong>Mode of payment:</strong> {{ record.mode_of_payment }}
+                      </div>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="card mb-2">
+                      <div class="card-body">
+                          <strong>Number of cheques:</strong> {{ record.number_of_cheques }}
+                      </div>
+                  </div>
+              </div>
+          </div>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="float-right">
+  <a href="{% url 'create_maintenance_ticket' %}" class="btn btn-outline-danger bi-exclamation-octagon"><strong>  Report Maintenance Issue</strong></a> 
+  </div>
+  <!-- tenant_dashboard.html -->
+  
+  {% if maintenance_tickets %}
+  <table class="table table-sm table-bordered border-danger">
+    
+    <thead class="text-center table-light">
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Date Created</th>
+        <th>Action</th> <!-- Added column for actions -->
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {% for ticket in maintenance_tickets %}
+      <tr>
+        <td>{{ ticket.title }}</td>
+        <td>{{ ticket.description }}</td>
+        
+        <td>
+          
+          <span class="status-pill {% if ticket.status == 'Pending Approval for Inspection' %} pending{% elif ticket.status == 'Approved for Inspection' %}approved{% elif ticket.status == 'Rejected for Inspection' %}rejected{% endif %}">{{ ticket.status }}</span>
+            {% if ticket.status == 'Rejected for Inspection' %}
+            <button class="btn btn-sm btn-warning" onclick="showRejectionReason('{{ ticket.id }}')"><i class="bi bi-info-lg"></i> Show Reason</button>
+            <div id="rejectionModal_{{ ticket.id }}" class="modal">
+              <div class="modal-content">
+                <div class="modal-header text-center">
+                  <h5 class="modal-title"><i class="bi bi-exclamation-circle"></i> Rejection Reason</h5>
+                  <span class="close" onclick="closeRejectionModal('{{ ticket.id }}')">&times;</span>
+                </div>
+                <div class="modal-body">
+                  <p><strong>By maintenance company:</strong></p>
+                  <p>{{ ticket.rejection_reason }}</p>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          
+          {% if ticket.status == 'Quotation Created' %}
+          <a href="{% url 'view_quotations' record_id=record.id ticket_id=ticket.id %}" class="btn-sm btn btn-secondary" role="button">view quotation</a>
+
+          {% elif ticket.status == 'Quotation Approved By Owner'%}
+          <span class="badge badge-success">Quotation Approved By Owner</span>
+          <a href="{% url 'view_quotations' record_id=record.id ticket_id=ticket.id %}" class="btn-sm btn btn-secondary" role="button">view quotation</a>
+
+          {% elif ticket.status == 'Quotation Rejected By Owner'%}
+          <span class="badge badge-danger">Quotation Rejected By Owner</span>
+          <a href="{% url 'view_quotations' record_id=record.id ticket_id=ticket.id %}" class="btn-sm btn btn-secondary" role="button">view quotation</a>
+
+          {% elif ticket.status == 'Quotation Approved By Tenant'%}
+          <span class="badge badge-success">You Approved the Quotation</span><br/>
+          <a href="{% url 'view_quotations' record_id=record.id ticket_id=ticket.id %}" class="btn-sm btn btn-secondary" role="button">view quotation</a>
+
+          {% elif ticket.status == 'Quotation Rejected By Tenant'%}
+          <span class="badge badge-danger">You Rejected the Quotation</span>
+          <a href="{% url 'view_quotations' record_id=record.id ticket_id=ticket.id %}" class="btn-sm btn btn-secondary" role="button">view quotation</a>
+
+          {% elif ticket.status == 'Fixed' %}
+          <form method="post" action="{% url 'update_ticket_status' ticket.id %}">
+            {% csrf_token %}
+                        <button type="submit" name="status" value="Issue Resolved"
+                                        class="btn-sm btn-success{% if ticket.status == 'Issue Resolved' %} disabled{% endif %}"
+                                        data-toggle="tooltip" data-placement="top" title="Issue Resolved">
+                                    <i class="bi-check-lg btn-sm"></i> Resolved
+                        </button>
+                        <button type="submit" name="status" value="Issue Not Resolved"
+                                        class="btn-sm btn-danger{% if ticket.status == 'Issue Not Resolved' %} disabled{% endif %}"
+                                        data-toggle="tooltip" data-placement="top" title="Issue Not Resolved">
+                                    <i class="bi-cross-lg btn-sm"></i> Not Resolved
+                        </button>
+            </form>
+
+          {% endif %}
+        </td>
+        <td>{{ ticket.created_at }}</td>
+        <td>
+          
+          <form method="post" action="{% url 'delete_maintenance_ticket' ticket.id %}" class="d-inline">
+            {% csrf_token %}
+            {% if ticket.status == 'Pending Approval for Inspection' %}
+            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this ticket?')"><i class="bi bi-trash"></i> DELETE</button>
+            {% else %}
+            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#cantDeleteModal">
+              <span style="text-decoration: line-through;">DELETE</span>
+            </button>
+            
+            <div class="modal fade" id="cantDeleteModal" tabindex="-1" role="dialog" aria-labelledby="cantDeleteModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title" id="cantDeleteModalLabel">Cannot Delete Ticket</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    Ticket cannot be deleted: Report already submitted.
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% else %}
+<div class="text-center">
+<p>No maintenance tickets found.</p> </div>
+{% endif %}
+
+
+{% else %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="card-title mb-0 text-center">
+            <strong>Welcome, {{ user.first_name|title }} {{ user.last_name|title }}!</strong>
+          </h5>
+        </div>
+        <div class="card-body">
+          <h1 class="text-center text-danger">Oops!</h1>
+          <p class="lead text-center">It seems like you don't have a record with us.</p>
+          <div class="text-center mt-4">
+            <p class="mb-0">Can't find your details? <a href="{% url 'add_property' %}" class="btn btn-primary btn-sm">Add here</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add this HTML code to your template where you want the modal to appear -->
+<div class="modal fade" id="registrationModal" tabindex="-1" aria-labelledby="registrationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Adjust modal-lg for width, e.g., modal-sm, modal-md, or custom CSS -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger" id="registrationModalLabel">Registration Required</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>You need to register with us to create a maintenance ticket.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Not Now</button>
+        <a href="{% url 'add_property' %}" class="btn btn-primary">Add Details</a>
+
+        
+        <!-- You can add a button here to redirect users to the registration page if needed -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Include Bootstrap CSS and JS -->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+
+<div class="container mt-4">
+  <h3 class="text-center">My Maintenance Tickets</h3>
+  <div class="text-center mb-3">
+    <a class="btn btn-primary" href="#" data-bs-toggle="modal" data-bs-target="#registrationModal">Create Maintenance Ticket</a>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <ul class="list-group">
+        {% for ticket in maintenance_tickets %}
+        <li class="list-group-item">
+          <h5 class="mb-1">{{ ticket.title }}</h5>
+          <p class="mb-1">{{ ticket.description }}</p>
+          <small>Status: {{ ticket.status }}</small><br>
+          <small>Date Created: {{ ticket.created_at }}</small>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No maintenance tickets found.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+{% endif %}
+
+
+<script>
+  function showRejectionReason(ticketId) {
+      var modal = document.getElementById("rejectionModal_" + ticketId);
+      modal.style.display = "block";
+  }
+
+  function closeRejectionModal(ticketId) {
+      var modal = document.getElementById("rejectionModal_" + ticketId);
+      modal.style.display = "none";
+  }
+
+  // Close the modal if the user clicks outside of it
+  window.onclick = function(event) {
+      {% for ticket in maintenance_tickets %}
+          var modal_{{ ticket.id }} = document.getElementById("rejectionModal_{{ ticket.id }}");
+          if (event.target == modal_{{ ticket.id }}) {
+              modal_{{ ticket.id }}.style.display = "none";
+          }
+      {% endfor %}
+  };
+
+  window.addEventListener('load', function() {
+    const animateElements = document.querySelectorAll('.animate');
+    animateElements.forEach(function(element) {
+      element.style.opacity = 1;
+    });
+  });
+
+  function showRejectionReason(ticketId) {
+    const modal = document.getElementById(`rejectionModal_${ticketId}`);
+    modal.style.display = "block";
+  }
+  
+  function closeRejectionModal(ticketId) {
+    const modal = document.getElementById(`rejectionModal_${ticketId}`);
+    modal.style.display = "none";
+  }
+  
+  window.onclick = function(event) {
+    const modals = document.getElementsByClassName("modal");
+    for (let i = 0; i < modals.length; i++) {
+      const modal = modals[i];
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  }
+  
+  // Add animation on page load
+ 
+
+</script>
+
+
+
+{% endblock %}

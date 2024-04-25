@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+
+    .main-content{
+        padding-left: 200px;
+    }
+</style>
+<div class="main-content">
+<div class="container-fluid">
+    <br/>
+    <div class="container text-center">
+        <h2>List of all your properties</h2>
+        <br/>
+      </div>
+      
+      <form method="GET" class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" name="search_query" placeholder="Search by Unit Number or Location" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+      
+    
+    <a href="{% url 'home' %}" class="btn btn-danger">Back</a>
+    <a class="btn btn-primary mb-3 float-end" href="{% url 'add_property' %}">
+        <i class="bi bi-plus-lg"></i> Add Property
+    </a>
+
+
+    <div class="table-responsive mt-3">
+
+        
+        <table class="table table-striped table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Unit Number</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Bedrooms</th>
+                    <th scope="col">Bathrooms</th>
+                    <th scope="col">Rent Price</th>
+                    <th scope="col">Rented/Vacant</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if properties %}
+                    {% for property in properties %}
+                        <tr onclick="window.location='{% url 'property' property.id %}';" style="cursor:pointer;">
+                            <td>{{ property.property_number }}</td>
+                            <td>{{ property.property_location }}</td>
+                            <td>{{ property.property_type }}</td>
+                            <td>{{ property.property_bedrooms }}</td>
+                            <td>{{ property.property_bathrooms }}</td>
+                            <td>{{ property.property_rentedFor }} AED</td>
+                            <td>
+                                {% if property.is_associated %}
+                                  <span class="badge badge-success">Rented</span>
+                                {% else %}
+                                  <span class="badge badge-primary">Vacant</span>
+                                {% endif %}
+                              </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <style>
+        .profile-row {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .profile-row:hover {
+            transform: scale(1.05);
+        }
+    </style>
+    <div class="container mt-5 profile-row">
+        <div class="card shadow-lg mx-auto" style="max-width: 400px; animation: fadeInUp 0.5s ease-out;">
+            <div class="card-body text-center"> <!-- Center the content -->
+                <h1 class="mb-4">My Profile</h1>
+                <div class="mb-3 profile-row">
+                    <img src="{% static 'website/images/Male.png' %}" alt="Profile Image" class="img-fluid rounded-circle" style="max-width: 200px;">
+                    <h5 class="mt-3"><strong>{{ user.get_full_name|title }}</strong></h5>
+                </div>
+
+                <div class="row mb-3 profile-row">
+                    <div class="col">
+                        <strong>Username:</strong> {{ user.username }}
+                    </div>
+                </div>
+
+                <div class="row mb-3 profile-row">
+                    <div class="col">
+                        <strong>Email:</strong> {{ user.email }}
+                    </div>
+                </div>
+
+                <div class="row mb-3 profile-row">
+                    <div class="col">
+                        <strong>Phone Number:</strong> {{ user.registered_number }}
+                    </div>
+                </div>
+
+                
+
+                <div class="mb-3">
+                    <strong>Joined:</strong> {{ user.date_joined|date:"F j, Y" }}
+                </div>
+                
+                <a href="{% url 'update_my_profile' %}" class="btn btn-secondary">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                
+            </div>
+        </div>
+    </div>
+{% endblock %}

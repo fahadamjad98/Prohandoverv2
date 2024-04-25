@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    .form-card {
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .form-card:hover {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-card .card-header {
+        background: linear-gradient(45deg, #343a40, #212529);
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        color: #fff;
+        padding: 1.5rem;
+    }
+
+    .form-card .card-body {
+        padding: 2rem;
+    }
+
+    .form-card .form-control {
+        border-radius: 5px;
+        box-shadow: none;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .form-card .form-control:focus {
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+    }
+
+    .form-card .btn {
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .form-card .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="form-card card">
+        <div class="card-header text-center">
+            <h1 class="card-title">Add a Property</h1>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{% url 'add_property' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.property_name.label_tag }}
+                        {{ form.property_name }}
+                        {{ form.property_name.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.property_number.label_tag }}
+                        {{ form.property_number }}
+                        {{ form.property_number.errors }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.property_size.label_tag }}
+                        {{ form.property_size }}
+                        {{ form.property_size.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.property_location.label_tag }}
+                        {{ form.property_location }}
+                        {{ form.property_location.errors }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.property_type.label_tag }}
+                        {{ form.property_type }}
+                        {{ form.property_type.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.property_bedrooms.label_tag }}
+                        {{ form.property_bedrooms }}
+                        {{ form.property_bedrooms.errors }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.property_bathrooms.label_tag }}
+                        {{ form.property_bathrooms }}
+                        {{ form.property_bathrooms.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.property_rentedFor.label_tag }}
+                        {{ form.property_rentedFor }}
+                        {{ form.property_rentedFor.errors }}
+                    </div>
+                </div>
+
+
+
+            {{ form.property_doc_info_1 }} {{ form.property_document_1 }}
+            {{ form.property_document.errors_1 }}
+            {{ form.property_doc_info_2 }} {{ form.property_document_2 }}
+            {{ form.property_document.errors_2 }}
+            {{ form.property_doc_info_3 }} {{ form.property_document_3 }}
+            {{ form.property_document.errors_3 }}
+
+            
+                          <div class="row">
+                    <div class="col-md-6">
+                        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-caret-left"></i> back
+                        </a>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus"></i> Submit
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

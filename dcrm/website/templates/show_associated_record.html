@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if record %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <h5 class="card-header">
+                    <strong>Welcome Back! {{ record.first_name }} {{ record.last_name }}</strong>
+                </h5>
+                <div class="card-body">
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <strong>Email:</strong> {{ record.email }}
+                        </div>
+                    </div>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <strong>Phone:</strong> {{ record.phone }}
+                        </div>
+                    </div>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <strong>Address:</strong> {{ record.address }}
+                        </div>
+                    </div>
+                    <!-- Repeat the pattern for other information -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <h5 class="card-header">
+                    <strong>Additional Information</strong>
+                </h5>
+                <div class="card-body">
+                  <li class="list-group-item"><strong>Living in:</strong> {{ record.property }}</li>
+                  <li class="list-group-item"><strong>DEWA No.</strong> {{ record.dewa }}</li>
+                  <li class="list-group-item"><strong>Contract Start Date:</strong> {{ record.contract_start}}</li>
+                  <li class="list-group-item"><strong>Contract End Date:</strong> {{ record.contract_end}}</li>
+                  <li class="list-group-item"><strong>Annual Rent:</strong> {{ record.annual_rent}}</li>
+                  <li class="list-group-item"><strong>Contract Value:</strong> {{ record.contract_value}}</li>
+                  <li class="list-group-item"><strong>Security Deposit:</strong> {{ record.security_deposit}}</li>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% else %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Back, {{ user.first_name }} {{ user.last_name }}!</title>
+  <style>
+
+    .card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+    }
+    strong {
+      font-size: 24px;
+      color: #3498db;
+    }
+    h1 {
+      font-size: 36px;
+      color: #e74c3c;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <strong>Welcome Back, {{ user.first_name }} {{ user.last_name }}!</strong>
+    <h1>No Record Found!</h1>
+  </div>
+</body>
+</html>
+
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+
+  @media screen and (max-width: 600px){
+    .phone-view{
+  padding-left: 60px;
+}
+}
+  
+</style>
+
+<div class="phone-view">
+  <div class="container mt-4">
+    <div class="card text-left" style="max-width: 500px;">
+      <div class="card-body text-center">
+    <h3><i class="bi bi-speedometer"></i> Maintenance Dashboard</h3>
+      </div>
+    </div>
+  </div>
+
+
+<div class="container mt-4">
+  <div class="card">
+  <div class="card-body text-center">
+    <h2><i class="bi bi-list-task"></i> List of Maintenance Issues:</h2>
+  </div>
+</div>
+</div>
+<main>
+{% if user.is_authenticated %}
+<div class="container mt-5 rounded-card">
+  <table class="table  table-hover table-bordered table-responsive-md">
+    <thead class="table-light text-center">
+      <tr>
+        <th scope="col">Created By</th>
+        <th scope="col">Maintenance Issue</th>
+        <th scope="col">Tenant Appointment Date</th>
+        <th scope="col">Approve / Reject</th>
+        <th scope="col">Ticket Created On</th>
+        <th scope="col">More Details</th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {% for ticket in maintenance_tickets reversed %}
+      <tr class="clickable-row" data-href="{% url 'view_maintenance_tickets' record_id=ticket.record.id ticket_id=ticket.id %}">
+        <td>{{ ticket.record.first_name }}</td>
+        <td>{{ ticket.title }}</td>
+        <td>{{ ticket.inspection_date }} ({{ ticket.inspection_time }})</td>
+        <td>
+          {% if ticket.status == 'Pending Approval for Inspection' %}
+          <form method="post" action="{% url 'update_ticket_status' ticket.id %}">
+            {% csrf_token %}
+            <button type="submit" name="status" value="Approved for Inspection"
+                    class="btn btn-outline-success{% if ticket.status == 'Approved for Inspection' %} disabled{% endif %}"
+                    data-toggle="tooltip" data-placement="top" title="Approve">
+              <i class="bi-check-lg btn-sm"></i> Approve
+            </button>
+            <button type="button" class="btn btn-outline-danger" onclick="openRejectionModal('{{ ticket.id }}')">
+              <i class="bi-x-lg btn-sm"></i> Reject
+            </button>
+          </form>
+
+          <!-- Rejection Modal -->
+          <div class="modal fade" id="rejectionModal{{ ticket.id }}" tabindex="-1" role="dialog"
+               aria-labelledby="rejectionModalLabel{{ ticket.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="rejectionModalLabel">Reason for Rejection</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <form method="post" action="{% url 'update_ticket_status' ticket.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="Rejected for Inspection">
+                    <div class="form-group">
+                      <label for="rejectionReason">Reason:</label>
+                      <textarea class="form-control" id="rejectionReason" name="rejection_reason" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Submit Rejection</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {% elif ticket.status == 'Approved for Inspection' %}
+          <form method="post" action="{% url 'update_ticket_status' ticket.id %}">
+            {% csrf_token %}
+            <button type="submit" name="status" value="Inspection Done"
+                    class="btn btn-outline-warning {% if ticket.status == 'Inspection Done' %} disabled{% endif %}"
+                    data-toggle="tooltip" data-placement="top" title="Inspection Done"
+                    onclick="redirectToQuotationForm(event)">
+              <i class="bi bi-check2-circle"></i> Inspection Done
+            </button>
+          </form>
+          {% elif ticket.status == 'Rejected for Inspection' %}
+          <p><span class="badge badge-danger">You rejected Inspection</span></p>
+          <form method="post" action="{% url 'update_ticket_status' ticket.id %}">
+            {% csrf_token %}
+            <button type="submit" name="status" value="Approved for Inspection"
+                    class="btn btn-outline-success{% if ticket.status == 'Approved for Inspection' %} disabled{% endif %}"
+                    data-toggle="tooltip" data-placement="top" title="Approve">
+              <i class="bi-check-lg btn-sm"></i> Approve
+            </button>
+          </form>
+          {% elif ticket.status == 'Inspection Done' %}
+          <p>Please go to <strong><i>"View Tickets"</strong></i> to make a quotation</p>
+          {% elif ticket.status == 'Quotation Created' %}
+          <p>
+            <span class="badge badge-warning">Quote approval pending</span>
+          </p>
+          {% elif not ticket.quote_tenant_approval and not ticket.quote_owner_approval%}
+          <p>
+            <span class="badge badge-danger">Quotation Rejected By Both</span>
+          </p>
+          {% elif ticket.status == 'Issue Resolved' %}
+          <p><span class="badge badge-primary">Ticket Closed</span></p>
+          {% else %}
+          <p><span class="badge badge-info">{{ ticket.status }}</span></p>
+          <form method="post" action="{% url 'update_ticket_status' ticket.id %}">
+            <select name="status" class="form-select" onchange="this.form.submit()">
+              <option value="Pending" {% if ticket.status == 'Pending' %}selected{% endif %}>Pending</option>
+              <option value="In Progress" {% if ticket.status == 'In Progress' %}selected{% endif %}>In Progress
+              </option>
+              <option value="Fixed" {% if ticket.status == 'Fixed' %}selected{% endif %}>Fixed</option>
+            </select>
+          </form>
+          {% endif %}
+        </td>
+        <td>{{ ticket.created_at }}</td>
+        <td>
+          <a href="{% url 'view_maintenance_tickets' record_id=ticket.record.id ticket_id=ticket.id %}"
+             class="btn btn-warning" role="button">
+            <i class="fas bi-pencil-square"></i> View Tickets
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+</div>
+</div>
+<script>
+  
+
+  function openRejectionModal(ticketId) {
+    $('#rejectionModal' + ticketId).modal('show');
+  }
+</script>
+</main>
+
+
+
+{% endblock %}

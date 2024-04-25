@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+
+  .body-main {
+    background: #ffffff;
+    border-bottom: 5px solid #1E1F23;
+    border-top: 5px solid #1E1F23;
+    border-left: 5px solid #1E1F23;
+    border-right: 5px solid #1E1F23;
+    margin: 30px auto;
+    max-width: 900px;
+    padding: 40px 30px !important;
+    position: relative;
+    
+    font-size: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .main thead {
+    background: #1E1F23;
+    color: #fff;
+  }
+
+  .img {
+    height: 100px;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  .pdf-button {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+</style>
+
+<div class="text-auto pdf-button">
+  <button onclick="generatePDF()" class="btn btn-outline-info"><i class="bi bi-download"></i></button>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.js"></script>
+<div class="container">
+
+  {% if quotations %}
+              
+    <div class="container" >
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2 body-main mx-auto">
+          <div class="col-md-12">
+            <div class="row">
+              <div class="col-md-4">
+                <img src="{% static 'website/images/invoice-pf.png' %}" alt="Invoice" class="img-fluid " style="max-width: 200px;">
+              </div>
+              <div class="col-md-8 text-right">
+                <h4 style="color: #black;"><strong>Problem Fixers</strong></h4>
+                <h4 style="color: #FF8C00; font-size: 16px;"><strong>Technical Services LLC</strong></h4>
+                <h5>INVOICE No. # {{ quotations.0.id }}</h5>
+                
+              </div>
+              <div class="col-md-8 text-left">
+                <br/>
+                {% if user.is_owner %}
+                <h6>To: {{ user.get_full_name | title }}</h6>
+                {% elif user.is_tenant %}
+                <h6>To: {{ record.first_name }} {{ record.last_name}}</h6>
+                {% elif user.is_PF %}
+                <h6>To: Owner/Tenant</h6>
+                {% endif %}
+                <h6>Ref # {{record.property}}</h6>
+                <h6>Date: {{ quotations.0.created_at }}</h6>
+                
+              </div>
+            </div>
+            <br />
+            <div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th><h5>Description</h5></th>
+                    <th><h5>Quantity</h5></th>
+                    <th><h5>Price</h5></th>
+                    <th><h5>Total</h5></th>
+                    <th><h5>Paid</h5></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for quotation in quotations %}
+                  {% if user.is_PF %}
+                  <a style="float:right;" class="btn-sm btn-danger" href="{% url 'update_quotation' record_id=record.id ticket_id=ticket.id quotation_id=quotation.id %}">Update Quotation</a>
+                  {% endif %}
+                                    {% for product in quotation.products.all %}
+                                        {% if user.is_owner and product.paid_by_owner %}
+                                            <tr>
+                                                <td class="col-md-9">{{ product.name }}</td>
+                                                <td class="col-md-3"><i class="fas fa-rupee-sign" aria-hidden="true"></i> {{ product.quantity }} </td>
+                                                <td class="col-md-3"><i class="fas fa-rupee-sign" aria-hidden="true"></i> {{ product.price }} </td>
+                                                <td class="col-md-3"><i class="fas fa-rupee-sign" aria-hidden="true"></i> {{ product.total }} </td>
+                                                <td class="col-md-3">  Owner</td>
+                                            </tr>
+                                            
+                                        {% elif user.is_tenant and not product.paid_by_owner %}
+                                            <tr>
+                                                <td class="col-md-9">{{ product.name }}</td>
+                                                <td class="col-md-3"><i class="fas fa-rupee-sign" aria-hidden="true"></i> {{ product.quantity }} </td>
+                                                <td class="col-md-3"><i class="fas fa-rupee-sign" aria-hidden="true"></i> {{ product.price }} </td>
+                                                <td class="col-md-3"><i class="fas fa-rupee-sign" aria-hidden="true"></i> {{ product.total }} </td>
+                                                <td class="col-md-3"> Tenant</td>
+                                            </tr>
+                                        {% elif user.is_PF %}
+                                        
+                                        <tr>
+                                          <td class="col-md-9">{{ product.name }}</td>
+                                          <td class="col-md-3"><i class="fas fa-rupee-sign" aria-hidden="true"></i> {{ product.quantity }} </td>
+                                          <td class="col-md-3"><i class="fas fa-rupee-sign" aria-hidden="true"></i> {{ product.price }} </td>
+                                          <td class="col-md-3"><i class="fas fa-rupee-sign" aria-hidden="true"></i> {{ product.total }} </td>
+                                          {% if product.paid_by_owner %}
+                                          <td class="col-md-3"> Owner</td>
+                                          {% else %}
+                                          <td class="col-md-3"> Tenant</td>
+                                          {% endif %}
+                                         
+                                      </tr>
+                                        {% endif %}
+                                        
+                                    {% endfor %}
+                                {% endfor %}
+                                        
+                                {% if user.is_owner %}    
+    <tr>
+        <td colspan="3" class="text-right">
+            <p><strong>Net Total Amount:</strong> <i class="fas fa-rupee-sign" aria-hidden="true"></i> </p>
+        </td>
+        <td class="text-left">{{ owner_total }}</td>
+    </tr>
+    <div style="float: right;">
+        {% if ticket.status == 'Quotation Created' or ticket.status == 'Quotation Rejected By Tenant' %}
+            <form method="post" action="{% url 'update_ticket_status' ticket.id %}">
+                {% csrf_token %}
+                {% if ticket.quote_tenant_approval and ticket.quote_owner_approval %}
+                    <!-- Both owner and tenant have approved/rejected -->
+                    <p><strong>Quotation Approved by both</strong></p>
+                {% elif not ticket.quote_tenant_approval and ticket.quote_owner_approval%}
+                <button type="submit" name="status" value="Quotation Approved By Owner" class="btn-sm btn-outline-success{% if ticket.status == 'Quotation Approved By Owner' or ticket.quote_tenant_approval %} disabled{% endif %}" data-toggle="tooltip" data-placement="top" title="Approve">
+                  <i class="bi-check-lg btn-sm"></i> Approve
+              </button>
+              <button type="submit" name="status" value="Quotation Rejected By Owner" class="btn-sm btn-outline-danger{% if ticket.status == 'Quotation Rejected By Owner' or ticket.quote_tenant_approval %} disabled{% endif %}" data-toggle="tooltip" data-placement="top" title="Refuse">
+                  <i class="bi-check-lg btn-sm"></i> Refuse
+              </button>
+                
+                {% else %}
+                    <button type="submit" name="status" value="Quotation Approved By Owner" class="btn-sm btn-outline-success{% if ticket.status == 'Quotation Approved By Owner' or ticket.quote_tenant_approval %} disabled{% endif %}" data-toggle="tooltip" data-placement="top" title="Approve">
+                        <i class="bi-check-lg btn-sm"></i> Approve
+                    </button>
+                    <button type="submit" name="status" value="Quotation Rejected By Owner" class="btn-sm btn-outline-danger{% if ticket.status == 'Quotation Rejected By Owner' or ticket.quote_tenant_approval %} disabled{% endif %}" data-toggle="tooltip" data-placement="top" title="Refuse">
+                        <i class="bi-check-lg btn-sm"></i> Refuse
+                    </button>
+                {% endif %}
+            </form>
+        {% endif %}
+    </div>
+{% elif user.is_tenant %}
+    <tr>
+        <td colspan="3" class="text-right">
+            <p><strong>Net Total Amount:</strong> <i class="fas fa-rupee-sign" aria-hidden="true"></i> </p>
+        </td>
+        <td class="text-left">{{ tenant_total }}</td>
+    </tr>
+    {% if ticket.status == 'Quotation Created' or ticket.status == 'Quotation Rejected By Owner' %}
+        <form method="post" action="{% url 'update_ticket_status' ticket.id %}">
+            {% csrf_token %}
+            {% if ticket.quote_owner_approval and ticket.quote_tenant_approval %}
+                <!-- Both owner and tenant have approved/rejected -->
+                <p><strong>Quotation Approved/Rejected by Owner and Tenant</strong></p>
+            {% else %}
+                <button type="submit" name="status" value="Quotation Approved By Tenant" class="btn-sm btn-outline-success{% if ticket.status == 'Quotation Approved By Tenant' or ticket.quote_owner_approval %} disabled{% endif %}" data-toggle="tooltip" data-placement="top" title="Approve">
+                    <i class="bi-check-lg btn-sm"></i> Approve
+                </button>
+                <button type="submit" name="status" value="Quotation Rejected By Tenant" class="btn-sm btn-outline-danger{% if ticket.status == 'Quotation Rejected By Tenant' or ticket.quote_owner_approval %} disabled{% endif %}" data-toggle="tooltip" data-placement="top" title="Refuse">
+                    <i class="bi-check-lg btn-sm"></i> Refuse
+                </button>
+            {% endif %}
+        </form>
+    {% endif %}
+{% endif %}
+                               
+                                  
+
+                                  {% else %}
+                                  <tr>
+                                    <td colspan="3" class="text-right">
+                                      <p><strong>Net Total Amount:</strong> <i class="fas fa-rupee-sign" aria-hidden="true"></i> </p></td>
+                                    <td class="text-left">{{ total_of_all_totals }}</td>
+                                  </tr>
+                                  
+                                  
+                                  {% endif %}
+
+                                  
+
+
+                </tbody>
+              </table>
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
+</div>
+
+<script>
+  function generatePDF() {
+    var element = document.querySelector('.body-main'); // You can adjust the selector as needed
+    html2pdf(element);
+  }
+  document.getElementById('approveTenantBtn').addEventListener('click', function() {
+    submitFormAndHideButtons('tenantForm', 'approveTenantBtn', 'rejectTenantBtn');
+});
+
+document.getElementById('rejectTenantBtn').addEventListener('click', function() {
+    submitFormAndHideButtons('tenantForm', 'approveTenantBtn', 'rejectTenantBtn');
+});
+</script>
+
+{% endblock %}

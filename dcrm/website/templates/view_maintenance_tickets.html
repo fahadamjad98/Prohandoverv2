@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+  <div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 400px;">
+      <div class="card-header bg-dark text-white text-center">
+        <h3 class="mb-0">- {{record.property}} - Maintenance Report</h3>
+      </div>
+
+      <div class="card-body">
+        {% if user.is_authenticated %}
+          <ul class="list-unstyled">
+            {% for ticket in maintenance_tickets %}
+            <h4>Tenant Information</h4>
+              <li>
+                <div class="card mx-auto">
+                  <div class="card-header bg-bullet-amber text-black">
+                <strong>Created By:</strong> {{ record.first_name }} {{ record.last_name }}<br>
+                <strong>Phone:</strong> {{ record.phone }}<br>
+                <strong>Address:</strong> {{ record.address }}<br>
+                
+              <h4>Ticket Information:</h4>
+                <strong>Property:</strong> {{ record.property }}<br>
+                <strong>Maintenance Issue:</strong> {{ ticket.title }}<br>
+                <strong>Maintenance Description:</strong> {{ ticket.description }}<br>
+                <strong>Status:</strong> {{ ticket.status }}<br>
+                <strong>Date Created:</strong> {{ ticket.created_at }}<br>
+                <br/>
+                
+                {% if ticket.quote_owner_approval or ticket.quote_tenant_approval %}
+                  <div class="text-center">
+                      <a href="{% url 'view_quotations' record_id=record.id ticket_id=ticket.id %}" class="btn btn-outline-info bi-chat-square" role="button">  View Quotation</a>
+                      
+                    </div>
+                {% endif %}
+                <!-- View Quotation Button if inspection done -->
+                
+
+                </div>
+              </div>
+                {{ ticket.approved }}
+                <form method="post" action="{% url 'update_ticket_status' ticket.id %}">
+                  {% if user.is_authenticated and user.is_PF %}
+                  {% csrf_token %}
+                  
+
+                  {% if ticket.status == 'Inspection Done' %}
+                  <a href="{% url 'create_quotation' record_id=record.id ticket_id=ticket.id %}" class="btn btn-outline-primary" role="button">
+                    <i class="fas bi-pencil"></i> Create Quotation
+                </a>
+
+                  {% endif %}
+
+
+
+              </form>
+
+              {% endif %}
+                <hr class="bg-dark">
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+        {% else %}
+        
+        
+        {% endif %}
+        
+      </div>
+    </div>
+
+{% endblock %}

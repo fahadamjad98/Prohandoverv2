@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    .login-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    }
+
+    .login-card .card-header {
+        background-color: #343a40;
+        color: #fff;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .login-card .card-body {
+        padding: 2rem;
+    }
+
+    .login-card .form-control {
+        border-radius: 20px;
+        background-color: #e9ecef;
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .login-card .form-control:focus {
+        background-color: #dee2e6;
+        box-shadow: none;
+    }
+
+    .login-card .btn-primary {
+        border-radius: 20px;
+        background-color: #343a40;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .login-card .btn-primary:hover {
+        background-color: #212529;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-card .input-group-text {
+        background-color: transparent;
+        border: none;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card login-card">
+                <div class="card-header text-center">
+                    <h4 class="mb-0"> Login</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Username:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                {{ form.username }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">Password:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                {{ form.password }}
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">Not a user? <a href="{% url 'register' %}">Register here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

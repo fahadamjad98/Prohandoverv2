@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .main-content{
+    padding-left: 250px;
+  }
+</style>
+<div class="main-content">
+  <h1>File Upload</h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form }}
+
+    <div>{{ document_form.document.errors }} </div>
+    <input type="submit" value="Submit"> </input>
+
+  </form>
+</div>
+{% endblock %}

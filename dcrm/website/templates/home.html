@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  .rounded-table {
+      border-radius: 8px;
+      overflow: hidden;
+  }
+
+  .custom-badge {
+      font-size: 1em;
+      padding: 0.3em 0.6em;
+  }
+  .custom-card-body {
+    padding: 5px; /* Adjust the padding as needed */
+  }
+
+  @media (max-width: 767px) {
+    .main {
+      padding-left: 30px;
+    }
+  }
+</style>
+
+{% if user.is_authenticated %}
+<div class="main">
+  <div class="container">
+    <br/>
+    <div class="card text-left" style="max-width: 500px;">
+      <div class="card-body text-center">
+        {% if user.is_owner %}
+    <h3> <i class="bi bi-speedometer"></i> {{ owner.first_name | title }}'s Dashboard</h3>
+        {% elif user.is_PMGT %}
+        <h3> <i class="bi bi-speedometer"></i> PMGT Dashboard - {{ owner.first_name | title }} {{ owner.last_name | title }}</h3>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row justify-content-center">
+    <div class="col-xl-3 col-sm-6 col-12 mb-4">
+      {% if user.is_PMGT %}
+      <a href="{% url 'list_of_records' owner_username=owner.username %}" style="text-decoration: none; color: inherit;">
+        {% elif user.is_owner %}
+        <a href="{% url 'list_of_records' %}" style="text-decoration: none; color: inherit;">
+        {% endif %}
+        <div class="card rounded-table">
+          <div class="card-body">
+            <div class="media d-flex">
+              <div class="media-body text-center">
+                <h3 class="success">{{ total_records_count }}</h3>
+                <span>Total Tenants</span>
+              </div>
+              <div class="align-self-center">
+                <i class="icon-user success font-large-2 float-right"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-center">
+          {% if user.is_PMGT %}
+          <a class="btn-sm btn-success mt-2" href="{% url 'add_record' owner_username=owner.username %}">
+              <i class="bi bi-plus-lg"></i> Add
+          </a>
+      {% else %}
+          <a class="btn-sm btn-success mt-2" href="{% url 'add_record' %}">
+              <i class="bi bi-plus-lg"></i> Add
+          </a>
+      {% endif %}
+      
+      </div>
+      </a>
+    </div>
+
+
+    
+    <div class="col-xl-3 col-sm-6 col-12 mb-4">
+      {% if user.is_PMGT %}
+            <a href="{% url 'list_of_properties_pmgt' owner_username=owner.username %}" style="text-decoration: none; color: inherit;">
+      {% elif user.is_owner %}
+            <a href="{% url 'list_of_properties' %}" style="text-decoration: none; color: inherit;">
+      {% endif %}
+        <div class="card rounded-table">
+          <div class="card-body">
+            <div class="media d-flex">
+              <div class="media-body text-center">
+                <h3 class="danger">{{ total_properties_count }}</h3>
+                <span>Total Properties</span>
+              </div>
+              <div class="align-self-center">
+                <i class="icon-pointer danger font-large-2 float-right"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-center">
+          {% if user.is_PMGT %}
+          <a class="btn-sm btn-info mt-2" href="{% url 'add_property' owner_username=owner.username %}"><i class="bi bi-plus-lg"></i> Add</a></div>
+          {% elif user.is_owner %}
+          <a class="btn-sm btn-info mt-2" href="{% url 'add_property' %}"><i class="bi bi-plus-lg"></i> Add</a></div>
+          {% endif %}
+      </a>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card rounded-table">
+        <div class="card-body custom-card-body">
+          <div class="card-body text-center">
+            <h6 class="card-title">Upcoming Renewals:</h6>
+            <div class="table-container">
+              <table class="table table-bordered">
+                <thead class="text-center">
+                  <tr>
+                    <th>Name</th>
+                    <th>Property</th>
+                    <th>Days Until Expiry</th>
+                  </tr>
+                </thead>
+                <tbody class="text-center">
+                  {% if records %}
+                    {% for record, days_until_expiry in days_until_expiry_list %}
+                    {% if user.is_owner %}
+                    <tr onclick="window.location='{% url 'record' record.id %}';" style="cursor:pointer;">
+                {% elif user.is_PMGT %}
+                <tr onclick="window.location='{% url 'record' owner_username=record.user.username pk=record.id %}';" style="cursor:pointer;">
+                {% endif %}
+                        <td><a style="text-decoration: none;" >{{ record.first_name }} {{ record.last_name }}</a></td>
+                        <td>{{ record.property }}</td>
+                        <td>
+                          {% if days_until_expiry > 0 %}
+                            <span class="badge {% if days_until_expiry <= 100 %}bg-danger{% else %}bg-success{% endif %} custom-badge">
+                                {{ days_until_expiry }} days
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger custom-badge">
+                                Contract has Expired.
+                            </span>
+                        {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card rounded-table">
+        <div class="card-body custom-card-body">
+          <div class="card-body text-center">
+            <h6 class="card-title">Maintenance Issues:</h6>
+            <div class="table-container">
+              <table class="table table-bordered">
+              <thead class="text-center">
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Address</th>
+                  <th scope="col">Create On</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Tickets</th>
+                </tr>
+              </thead>
+              <tbody class="text-center">
+                {% if maintenance_tickets %}
+                  {% for maintenance_ticket in maintenance_tickets %}
+                    <tr onclick="window.location='{% url 'view_maintenance_tickets' record_id=maintenance_ticket.record.id ticket_id=maintenance_ticket.id %}';" style="cursor:pointer;">
+                      <td><a style="text-decoration: none;" href="{% url 'view_maintenance_tickets' record_id=maintenance_ticket.record.id ticket_id=maintenance_ticket.id %}">{{ maintenance_ticket.record.first_name }} {{ maintenance_ticket.record.last_name }}</a></td>
+                      <td>{{ maintenance_ticket.record.property.property_number }} {{ maintenance_ticket.record.property.property_name }}</td>
+                      <td>{{ maintenance_ticket.created_at }}</td>
+                      <td>
+                        {% if maintenance_ticket.status == 'Pending Approval for Inspection' %}
+                            <span class="badge badge-warning">{{ maintenance_ticket.status }}</span>
+                        {% elif maintenance_ticket.status == 'Approved for Inspection' %}
+                            <span class="badge badge-success">{{ maintenance_ticket.status }}</span>
+                        {% elif maintenance_ticket.status == 'Approved for Inspection' %}
+                            <span class="badge badge-success">{{ maintenance_ticket.status }}</span>
+                        {% elif maintenance_ticket.status == 'Inspection Done' %}
+                            <span class="badge badge-success">{{ maintenance_ticket.status }}</span>  
+                        {% elif maintenance_ticket.status == 'Quotation Created' %}
+                            <span class="badge badge-infp">{{ maintenance_ticket.status }}</span> 
+                            <p style="font-size: 11px;">Click "View Tickets"</p>
+                        {% else %}
+                            <span class="badge badge-primary">{{ maintenance_ticket.status }}</span>
+                        {% endif %}
+                    </td>
+                     
+                      <td>
+                        {% if maintenance_tickets %}
+                          <a href="{% url 'view_maintenance_tickets' record_id=maintenance_ticket.record.id ticket_id=maintenance_ticket.id %}" class="btn btn-warning btn-sm" role="button">
+                            <i class="fas bi-pencil"></i> View Tickets
+                          </a>
+                        {% else %}
+                          No Maintenance Tickets
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+{% endif %}
+
+
+
+
+{% endblock %}

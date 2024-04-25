@@ -1,0 +1,450 @@
+{% load static %}
+
+<style>
+    .user-image {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+    }
+
+    .dropdown-toggle::after {
+        margin-top: -1rem; /* Adjust the margin to vertically align the arrow with the username */
+        content: '\2228'; /* Unicode character for a down arrow */
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .dropdown-toggle:hover::after {
+        transform: rotate(360deg); /* Rotate the arrow when hovering */
+    }
+
+    .sidebar-right {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 210px;
+        background-color: #343a40;
+        padding: 20px;
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,.9);
+        z-index: 1;
+      }
+      
+      .sidebar-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .sidebar-divider {
+        width: 100%;
+        height: 1px;
+        background-color: #ddd;
+        margin: 20px 0;
+      }
+      
+      .sidebar-links {
+        width: 100%;
+        margin-top: 20px;
+        
+      }
+      
+      .sidebar-links a {
+        display: block;
+        padding: 10px 15px;
+        text-decoration: none;
+        color: white;
+        transition: background-color 0.3s ease;
+        border-radius: 4px; /* Add this line */
+        
+      }
+      
+      .sidebar-links a:hover {
+        background-color: orange; /* Update the hover color */
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+      }
+      
+      .sidebar-links i {
+        margin-right: 10px;
+      }
+
+      .sidebar-links-heading {
+        width: 100%;
+        text-align: left;
+        color: #E5E4E2;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+        position: relative;
+        padding-left: 20px;
+        
+      }
+      
+      .sidebar-links-heading::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 20px;
+        width: 5px;
+        background-color: #4b545c;
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+      }
+
+      .sidebar-settings-heading {
+        width: 100%;
+        text-align: left;
+        color: #E5E4E2;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+        position: relative;
+        padding-left: 20px;
+      }
+      
+      .sidebar-settings-heading::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 20px;
+        width: 5px;
+        background-color: orange;
+      }
+
+      .sidebar-right .navbar-brand {
+        position: relative;
+        padding-left: 20px;
+        color: white;
+      }
+      
+
+      .sidebar-right .navbar-brand::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 30px;
+        width: 5px;
+        background-color: orange;
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+        z-index: 998;
+        display: none; /* Initially hidden */
+      }
+
+      @media (max-width: 767px) {
+        .sidebar-right {
+          width: 60px; /* Reduced width for mobile */
+          transition: width 0.3s ease; /* Add a transition for the width change */
+        }
+      
+        .sidebar-right.expanded {
+          width: 210px; /* Expanded width */
+          z-index: 999;
+        }
+      
+        .sidebar-content {
+          display: none; /* Hide the sidebar content initially */
+        }
+      
+        .sidebar-content.show {
+          display: flex; /* Show the sidebar content when expanded */
+        }
+      
+        .sidebar-toggle {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 60px; /* Match the reduced sidebar height */
+          cursor: pointer;
+        }
+      
+        .sidebar-toggle i {
+          font-size: 24px;
+          color: white;
+        }
+
+        .sidebar-overlay.show {
+            display: block; /* Show the overlay when the sidebar is expanded */
+          }
+      }
+
+
+
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container px-5">
+        {% if user.is_authenticated and user.is_tenant  %}
+        <a class="navbar-brand" href="{% url 'home' %}">PRO HANDOVER</a>
+        {% elif user.is_authenticated and user.is_owner %}
+
+        {% elif user.is_authenticated and user.is_PF %}
+        <a class="navbar-brand" href="{% url 'problem_fixers' %}">PRO HANDOVER</a>
+        {% elif user.is_authenticated and user.is_PMGT %}
+        <a class="navbar-brand" href="{% url 'pmgt_dashboard' %}">PRO HANDOVER</a>
+        {% else %}
+        <a class="navbar-brand" href="{% url 'index' %}">PRO HANDOVER</a>
+        {% endif %}
+        
+        <!-- Move Login and Register buttons here -->
+        <div class="ml-auto">
+            {% if not user.is_authenticated %}
+                <a class="btn btn-success mx-1" href="{% url 'register' %}">
+                    <i class="bi bi-people"></i> Register
+                </a>
+                <a class="btn btn-outline-info mx-1" href="{% url 'login_view' %}">
+                    <i class="bi bi-person"></i> Login
+                </a>
+            {% endif %}
+        </div>
+        
+        <!-- Remove the navbar-toggler button and the navbar-collapse div -->
+        
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            {% if user.is_authenticated and user.is_owner %}
+            <div class="sidebar-overlay"></div>
+            <div class="sidebar-right">
+                <div class="sidebar-toggle">
+                  <i class="bi bi-list"></i>
+                </div>
+                <div class="sidebar-content">
+                    <a class="navbar-brand" href="{% url 'home' %}">
+                        <img src="{% static 'website\images\Logo Prohandover.png' %}" alt="PRO HANDOVER" style="width: 150px; height: auto;">
+                    </a>
+                    
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-links-heading">
+                    Quick Links
+                  </div>
+                  
+                <div class="sidebar-links">
+                    <a href="{% url 'add_record' %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-add" viewBox="0 0 16 16">
+                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                            <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
+                          </svg> Add a tenant
+                    </a>
+                    <a href="{% url 'add_property' %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-building-add" viewBox="0 0 16 16">
+                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"/>
+                            <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6.5a.5.5 0 0 1-1 0V1H3v14h3v-2.5a.5.5 0 0 1 .5-.5H8v4H3a1 1 0 0 1-1-1z"/>
+                            <path d="M4.5 2a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-6 3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-6 3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+                          </svg> Add a property
+                </a>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-links-heading">
+                    Management
+                  </div>
+                  <a href="{% url 'list_of_properties' %}">
+                    <i class="bi bi-people"></i> All Properties
+                </a>
+                <a href="{% url 'list_of_records' %}">
+                    <i class="bi bi-building"></i> All Tenants
+                 </a>
+                 <div class="sidebar-divider"></div>
+                 <div class="sidebar-links-heading">
+                    Maintenance
+                  </div>
+                  <a href="#">
+                    <i class="bi bi-exclamation-triangle" ></i> All Tickets
+                </a>
+                <div class="sidebar-divider"></div>
+
+                <div class="sidebar-settings-heading">
+                    Settings
+                </div>
+                <a class="dropdown-item" href="{% url 'my_profile'%}"><i class="bi bi-person"></i>{{ user.username | title }}'s Profile</a>
+                        <a class="dropdown-item" href="{% url 'reset_password' %}"><i class="bi bi-key"></i> Reset Password</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="btn btn-danger btn-block" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                
+                </div>
+            </div>
+            </div>
+
+                {% elif user.is_authenticated and user.is_tenant %}
+                <div class="sidebar-overlay"></div>
+                <div class="sidebar-right">
+                    <div class="sidebar-toggle">
+                      <i class="bi bi-list"></i>
+                    </div>
+                    <div class="sidebar-content">
+                        <a class="navbar-brand" href="{% url 'home' %}">
+                            <img src="{% static 'website\images\Logo Prohandover.png' %}" alt="PRO HANDOVER" style="width: 150px; height: auto;">
+                        </a>
+                        
+                    <div class="sidebar-divider"></div>
+                    <div class="sidebar-links-heading">
+                        Quick Links
+                      </div>
+                      
+                    <div class="sidebar-links">
+                        <a href="{% url 'create_maintenance_ticket' %}">
+                          <i class="bi bi-exclamation-octagon"></i> Report Issue
+                        </a>
+                        
+                    <div class="sidebar-divider"></div>
+                    <div class="sidebar-links-heading">
+                        Management
+                      </div>
+                      <a href='#'>
+                        <i class="bi bi-people"></i> Documents
+                    </a>
+                    
+                     <div class="sidebar-divider"></div>
+                     <div class="sidebar-links-heading">
+                        Maintenance
+                      </div>
+                      <a href="#">
+                        <i class="bi bi-exclamation-triangle" ></i> All Tickets
+                    </a>
+                    <div class="sidebar-divider"></div>
+    
+                    <div class="sidebar-settings-heading">
+                        Settings
+                    </div>
+                    <a class="dropdown-item" href="{% url 'my_profile'%}"><i class="bi bi-person"></i>{{ user.username | title }}'s Profile</a>
+                            <a class="dropdown-item" href="{% url 'reset_password' %}"><i class="bi bi-key"></i> Reset Password</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="btn btn-danger btn-block" href="{% url 'logout' %}">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                    
+                    </div>
+                </div>
+                </div>
+
+            {% elif user.is_authenticated and user.is_PMGT %}
+                <li class="nav-item">
+                    <a class="btn btn-warning mx-1" href="{% url 'pmgt_dashboard' %}">
+                        <i class="bi bi-speedometer"></i> Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="{% static 'website/images/Male.png' %}" alt="User Image" class="user-image mx-2">
+                        {{ user.username }}
+                    </a>
+                    <div class="dropdown-menu mt-2" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{% url 'my_profile'%}"><i class="bi bi-person"></i> My Profile</a>
+                        <a class="dropdown-item" href="{% url 'reset_password' %}"><i class="bi bi-key"></i> Reset Password</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="btn btn-outline-danger btn-block" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </div>
+                </li>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            {% elif user.is_authenticated and user.is_PF %}
+            <div class="sidebar-overlay"></div>
+            <div class="sidebar-right">
+                <div class="sidebar-toggle">
+                  <i class="bi bi-list"></i>
+                </div>
+                <div class="sidebar-content">
+                    <a class="navbar-brand" href="{% url 'problem_fixers' %}">
+                        <img src="{% static 'website\images\Logo Prohandover.png' %}" alt="PRO HANDOVER" style="width: 150px; height: auto;">
+                    </a>
+                    
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-links-heading">
+                    Quick Links
+                  </div>
+                  
+                <div class="sidebar-links">
+                    <a href="#">
+                      <i class="bi bi-toggle-on"></i> Approved Tickets
+                    </a>
+                    <a href="{% url 'add_property' %}">
+                      <i class="bi bi-toggle-off"></i> Rejected Tickets
+                    </a>
+                    <a href="{% url 'list_of_tickets' %}">
+                      <i class="bi bi-list-check"></i> Closed Tickets
+                    </a>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-links-heading">
+                    Management
+                  </div>
+                  <a href="{% url 'list_of_properties' %}">
+                    <i class="bi bi-card-list"></i> All Tickets
+                </a>
+                <a href="{% url 'list_of_records' %}">
+                  <i class="bi bi-calculator"></i> All Quotations
+                 </a>
+                 <div class="sidebar-divider"></div>
+                 <div class="sidebar-links-heading">
+                    Maintenance
+                  </div>
+                  <a href="#">
+                    <i class="bi bi-exclamation-triangle" ></i> Pending Tickets
+                </a>
+                <div class="sidebar-divider"></div>
+
+                <div class="sidebar-settings-heading">
+                    Settings
+                </div>
+                <a class="dropdown-item" href="{% url 'my_profile'%}"><i class="bi bi-person"></i>{{ user.username | title }}'s Profile</a>
+                        <a class="dropdown-item" href="{% url 'reset_password' %}"><i class="bi bi-key"></i> Reset Password</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="btn btn-danger btn-block" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                
+                </div>
+            </div>
+            </div>
+            
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const sidebarRight = document.querySelector('.sidebar-right');
+    const sidebarContent = document.querySelector('.sidebar-content');
+    const sidebarOverlay = document.querySelector('.sidebar-overlay');
+
+    let isSidebarExpanded = false;
+
+    sidebarToggle.addEventListener('click', function() {
+        toggleSidebar();
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!sidebarRight.contains(event.target) && isSidebarExpanded) {
+        toggleSidebar();
+        }
+    });
+
+    function toggleSidebar() {
+        sidebarRight.classList.toggle('expanded');
+        sidebarContent.classList.toggle('show');
+        sidebarOverlay.classList.toggle('show');
+        isSidebarExpanded = !isSidebarExpanded;
+    }
+    });
+</script>
+

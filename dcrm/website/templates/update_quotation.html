@@ -1,0 +1,43 @@
+<!-- update_quotation.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Update Quotation</h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <!-- Display Quotation fields -->
+    {{ form.as_p }}
+
+    <!-- Display Product formset -->
+    {{ product_formset.management_form }}
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>By Owner</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product_form in product_formset %}
+          <tr>
+            <td>{{ product_form.name }}</td>
+            <td>{{ product_form.price }}</td>
+            <td>{{ product_form.quantity }}</td>
+            <td>{{ product_form.paid_by_owner }}</td>
+            <td>Total: 0.00</td> <!-- You may need to calculate this dynamically using JavaScript if needed -->
+          </tr>
+          {{ product_form.id }} {# Ensure that the product form ID is rendered for proper form submission #}
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <button type="submit">Update Quotation</button>
+  </form>
+{% endblock %}
